@@ -14,6 +14,7 @@ public class DatabaseDataProvider implements DataProvider {
     private final List<MonitoringObject> wialonObjects;
     private boolean isDeliveryStarted = false;
     private final Map<Integer, String> monitoringObjectMap;
+    private int databaseQueryFrequency = 8000;
 
     public DatabaseDataProvider(Map<Integer, String> monitoringObjectMap) {
         this.monitoringObjectMap = monitoringObjectMap;
@@ -43,26 +44,26 @@ public class DatabaseDataProvider implements DataProvider {
     private Thread createDBQueryThread() {
         return new Thread(() -> {
             while (isDeliveryStarted) {
-                Map<Integer, MonitoringData> monDataMap = /*mySQLLookup();*/ safDBLookup();
+                Map<Integer, MonitoringData> monDataMap = mySQLLookup();  //safDBLookup();
                 monDataMap.forEach((kvartaId, monData) -> {
-                String wialonId = monitoringObjectMap.get(kvartaId);
-                Optional<MonitoringObject> monObj = wialonObjects.stream()
-                        .filter(monitoringObject -> monitoringObject.getId() == wialonId)
-                        .findFirst();
-                if (monObj.isPresent()) {
-                    if (monData != null) {
-                        monObj.get().update(monData);
-                    }
-                }
+                        String wialonId = monitoringObjectMap.get(kvartaId);
+                        Optional<MonitoringObject> monObj = wialonObjects.stream()
+                                .filter(monitoringObject -> Objects.equals(monitoringObject.getId(), wialonId))
+                                .findFirst();
+                        if (monObj.isPresent()) {
+                            if (monObj.get().getTransmitterState().toString().equals("DisconnectedState"))
+                                monObj.get().startDataTransfer();
+                            monObj.get().update(monData);
+                        }
                 });
 
                 try {
-                    Thread.sleep(8000);
+                    Thread.sleep(databaseQueryFrequency);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            System.out.println("finish DB Thread");
+            System.out.println("DB Thread stopped");
         });
     }
 
@@ -132,15 +133,11 @@ public class DatabaseDataProvider implements DataProvider {
         return monDataMap;
     }
 
-//    private Map<String, Integer> objectMapping() {
-//        Map<String, Integer> objMapping = new HashMap<>();
-//        objMapping.put("20220001", 2394);
-//        objMapping.put("20220002", 2598);
-//        objMapping.put("20220003", 2601);
-//        objMapping.put("20220004", 403);
-//        objMapping.put("20220005", 195);
-//        objMapping.put("20220006", 816);
-//        objMapping.put("20220007", 85);
-//        return objMapping;
-//    }
+    public int getDatabaseQueryFrequency() {
+        return databaseQueryFrequency;
+    }
+
+    public void setDatabaseQueryFrequency(int databaseQueryFrequency) {
+        this.databaseQueryFrequency = databaseQueryFrequency;
+    }
 }
