@@ -30,14 +30,8 @@ public class ConnectedState implements StateIPS {
         try {
             communicator.communicate(ipsPacket);
             ipsTransmitter.setState(ipsTransmitter.getRegisteredState());
-        } catch (IPSConnectException e) {
+        } catch (IPSConnectException | IPSLoginException e) {
             System.out.println(e.getMessage());
-//            ipsTransmitter.setState(ipsTransmitter.getDisconnectedState());
-//            ipsTransmitter.getConnection().close();
-            stopCommunication();
-        } catch (IPSLoginException e) {
-            System.out.println(e.getMessage());
-//            ipsTransmitter.setState(ipsTransmitter.getStoppedState());
             stopCommunication();
         }
     }

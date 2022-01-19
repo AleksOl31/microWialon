@@ -29,12 +29,7 @@ public class RegisteredState implements StateIPS {
         IPSCommunicator communicator = new IPSCommunicator(ipsTransmitter.getConnection());
         try {
             communicator.communicate(ipsPacket);
-        } catch (IPSConnectException e) {
-            System.out.println(e.getMessage());
-//            ipsTransmitter.setState(ipsTransmitter.getDisconnectedState());
-//            ipsTransmitter.getConnection().close();
-            stopCommunication();
-        } catch (IPSDataException e) {
+        } catch (IPSConnectException | IPSDataException e) {
             System.out.println(e.getMessage());
             stopCommunication();
         }

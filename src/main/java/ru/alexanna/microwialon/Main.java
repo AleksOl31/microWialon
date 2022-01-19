@@ -18,21 +18,21 @@ public class Main {
         Monitoring monitoring = new Monitoring();
         monitoring.startMonitoring();
 
-        Thread.sleep(11_550);
-
-        monitoring.stopMonitoring();
-
-        Thread.sleep(6_550);
-
-        monitoring.startMonitoring();
-
-        Thread.sleep(7_550);
-
-        monitoring.stopMonitoring();
-
-        Thread.sleep(3_550);
-
-        monitoring.startMonitoring();
+//        Thread.sleep(11_550);
+//
+//        monitoring.stopMonitoring();
+//
+//        Thread.sleep(6_550);
+//
+//        monitoring.startMonitoring();
+//
+//        Thread.sleep(7_550);
+//
+//        monitoring.stopMonitoring();
+//
+//        Thread.sleep(3_550);
+//
+//        monitoring.startMonitoring();
     }
 
 }

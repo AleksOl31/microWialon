@@ -11,42 +11,53 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class DatabaseDataProvider implements DataProvider {
-    private final List<MonitoringObject> monitoringObjects;
-    private boolean isStart = false;
-    private final Map<String, Integer> objectMapping;
+    private final List<MonitoringObject> wialonObjects;
+    private boolean isDeliveryStarted = false;
+    private final Map<Integer, String> monitoringObjectMap;
 
-    public DatabaseDataProvider(List<MonitoringObject> monitoringObjects) {
-        this.monitoringObjects = monitoringObjects;
-        objectMapping = objectMapping();
+    public DatabaseDataProvider(Map<Integer, String> monitoringObjectMap) {
+        this.monitoringObjectMap = monitoringObjectMap;
+        wialonObjects = createWialonObjects();
+    }
+
+    private List<MonitoringObject> createWialonObjects() {
+        List<String> objectIds = new ArrayList<>(monitoringObjectMap.values());
+        List<MonitoringObject> wialonObjects = new ArrayList<>();
+        objectIds.forEach((str) -> wialonObjects.add(new MonitoringObject(str, null)));
+        return wialonObjects;
     }
 
     @Override
     public void startDataDelivery() {
-        isStart = true;
+        isDeliveryStarted = true;
+        wialonObjects.forEach(MonitoringObject::startDataTransfer);
         createDBQueryThread().start();
     }
 
     @Override
     public void stopDataDelivery() {
-        isStart = false;
-        for (MonitoringObject monitoringObject : monitoringObjects) {
-            monitoringObject.stopDataTransfer();
-        }
+        isDeliveryStarted = false;
+        wialonObjects.forEach(MonitoringObject::stopDataTransfer);
     }
 
     private Thread createDBQueryThread() {
         return new Thread(() -> {
-            while (isStart) {
-                Map<Integer, MonitoringData> monDataMap = mySQLLookup(); //safDBLookup();
-                for (MonitoringObject monitoringObject : monitoringObjects) {
-                    Integer kvartaId = objectMapping.get(monitoringObject.getId());
-                    MonitoringData monData = monDataMap.get(kvartaId);
+            while (isDeliveryStarted) {
+                Map<Integer, MonitoringData> monDataMap = /*mySQLLookup();*/ safDBLookup();
+                monDataMap.forEach((kvartaId, monData) -> {
+                String wialonId = monitoringObjectMap.get(kvartaId);
+                Optional<MonitoringObject> monObj = wialonObjects.stream()
+                        .filter(monitoringObject -> monitoringObject.getId() == wialonId)
+                        .findFirst();
+                if (monObj.isPresent()) {
                     if (monData != null) {
-                        monitoringObject.update(monData);
+                        monObj.get().update(monData);
                     }
                 }
+                });
+
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(8000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -121,11 +132,15 @@ public class DatabaseDataProvider implements DataProvider {
         return monDataMap;
     }
 
-    private Map<String, Integer> objectMapping() {
-        Map<String, Integer> objMapping = new HashMap<>();
-        objMapping.put("11223344", 2394);
-        objMapping.put("55667788", 2598);
-        objMapping.put("56785678", 2601);
-        return objMapping;
-    }
+//    private Map<String, Integer> objectMapping() {
+//        Map<String, Integer> objMapping = new HashMap<>();
+//        objMapping.put("20220001", 2394);
+//        objMapping.put("20220002", 2598);
+//        objMapping.put("20220003", 2601);
+//        objMapping.put("20220004", 403);
+//        objMapping.put("20220005", 195);
+//        objMapping.put("20220006", 816);
+//        objMapping.put("20220007", 85);
+//        return objMapping;
+//    }
 }
