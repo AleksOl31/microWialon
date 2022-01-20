@@ -14,7 +14,7 @@ public class DatabaseDataProvider implements DataProvider {
     private final List<MonitoringObject> wialonObjects;
     private boolean isDeliveryStarted = false;
     private final Map<Integer, String> monitoringObjectMap;
-    private int databaseQueryFrequency = 8000;
+    private int dbQueryPause = 8000;
 
     public DatabaseDataProvider(Map<Integer, String> monitoringObjectMap) {
         this.monitoringObjectMap = monitoringObjectMap;
@@ -44,7 +44,7 @@ public class DatabaseDataProvider implements DataProvider {
     private Thread createDBQueryThread() {
         return new Thread(() -> {
             while (isDeliveryStarted) {
-                Map<Integer, MonitoringData> monDataMap = mySQLLookup();  //safDBLookup();
+                Map<Integer, MonitoringData> monDataMap = /*mySQLLookup();*/  safDBLookup();
                 monDataMap.forEach((kvartaId, monData) -> {
                         String wialonId = monitoringObjectMap.get(kvartaId);
                         Optional<MonitoringObject> monObj = wialonObjects.stream()
@@ -58,7 +58,7 @@ public class DatabaseDataProvider implements DataProvider {
                 });
 
                 try {
-                    Thread.sleep(databaseQueryFrequency);
+                    Thread.sleep(dbQueryPause);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -75,7 +75,7 @@ public class DatabaseDataProvider implements DataProvider {
         props.setProperty("encoding", "WIN1251");
 
         Connection connection = DatabaseConnection.getConnection("jdbc:firebirdsql://10.70.0.150:3051/saf", props);
-        System.out.println(connection);
+        System.out.println(connection + " " + new Date());
         String query = "SELECT id, locono, locotime, locodate, speed, latitude, longitude, " +
                 "fuel_volume, fuel_dens, modify_dt, fuel_mass" +
                 " FROM data_gps";
@@ -86,12 +86,13 @@ public class DatabaseDataProvider implements DataProvider {
             while (rs.next()) {
                 MonitoringData monData = new MonitoringData();
                 monData.setDate(new Date());
-                monData.setLatitude(rs.getDouble(6));
-                monData.setLongitude(rs.getDouble(7));
-                monData.setSpeed(rs.getInt(5) / 10);
+                monData.setLatitude(rs.getDouble("latitude"));
+                monData.setLongitude(rs.getDouble("longitude"));
+                monData.setSpeed(rs.getInt("speed") / 10);
                 monData.setCourse(0);
                 monData.setSats(10);
-                monDataMap.put(rs.getInt(2), monData);
+                monData.setFuelVolume(rs.getInt("fuel_volume"));
+                monDataMap.put(rs.getInt("locono"), monData);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -133,11 +134,11 @@ public class DatabaseDataProvider implements DataProvider {
         return monDataMap;
     }
 
-    public int getDatabaseQueryFrequency() {
-        return databaseQueryFrequency;
+    public int getDbQueryPause() {
+        return dbQueryPause;
     }
 
-    public void setDatabaseQueryFrequency(int databaseQueryFrequency) {
-        this.databaseQueryFrequency = databaseQueryFrequency;
+    public void setDbQueryPause(int dbQueryPause) {
+        this.dbQueryPause = dbQueryPause;
     }
 }

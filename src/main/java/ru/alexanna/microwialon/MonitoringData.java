@@ -17,8 +17,8 @@ public class MonitoringData {
     /**
      * Дополнительные мониторинговые данные
      */
-    private Double fuelVolume;
-    private Double fuelWeight;
+    private Integer fuelVolume;
+    private Integer fuelWeight;
     private Integer fuelTemp;
 
     public Date getDate() {
@@ -77,19 +77,19 @@ public class MonitoringData {
         this.sats = sats;
     }
 
-    public Double getFuelVolume() {
+    public Integer getFuelVolume() {
         return fuelVolume;
     }
 
-    public void setFuelVolume(Double fuelVolume) {
+    public void setFuelVolume(Integer fuelVolume) {
         this.fuelVolume = fuelVolume;
     }
 
-    public Double getFuelWeight() {
+    public Integer getFuelWeight() {
         return fuelWeight;
     }
 
-    public void setFuelWeight(Double fuelWeight) {
+    public void setFuelWeight(Integer fuelWeight) {
         this.fuelWeight = fuelWeight;
     }
 

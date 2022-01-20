@@ -67,7 +67,8 @@ public class IPSTransmitter implements Transmitter {
     @Override
     public synchronized void addToTransfer(MonitoringData monData) {
         IpsPacket ipsPacket = new LongDataPacket.Builder(monData.getDate()).coordinates(monData.getLatitude(), monData.getLongitude())
-                        .course(monData.getCourse()).speed(monData.getSpeed()).params("Operation", ParameterType.Integer, Integer.toString(21)).create();
+                        .course(monData.getCourse()).speed(monData.getSpeed())
+                        .params("fuel", ParameterType.Integer, monData.getFuelVolume().toString()).create();
             buffer.add(ipsPacket);
             notify();
     }
