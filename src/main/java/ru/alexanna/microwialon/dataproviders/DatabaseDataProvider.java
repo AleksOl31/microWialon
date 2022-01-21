@@ -3,6 +3,7 @@ package ru.alexanna.microwialon.dataproviders;
 import ru.alexanna.microwialon.MonitoringData;
 import ru.alexanna.microwialon.MonitoringObject;
 import ru.alexanna.microwialon.database.DatabaseConnection;
+import ru.alexanna.microwialon.wialonips.connection.states.DisconnectedState;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -51,7 +52,7 @@ public class DatabaseDataProvider implements DataProvider {
                                 .filter(monitoringObject -> Objects.equals(monitoringObject.getId(), wialonId))
                                 .findFirst();
                         if (monObj.isPresent()) {
-                            if (monObj.get().getTransmitterState().toString().equals("DisconnectedState"))
+                            if (monObj.get().getTransmitterState() instanceof DisconnectedState)
                                 monObj.get().startDataTransfer();
                             monObj.get().update(monData);
                         }

@@ -6,16 +6,18 @@ import ru.alexanna.microwialon.Transmitter;
 import ru.alexanna.microwialon.network.ServerConnection;
 import ru.alexanna.microwialon.wialonips.connection.states.*;
 import ru.alexanna.microwialon.wialonips.packettypes.*;
+import ru.alexanna.microwialon.wialonips.util.IpsPacketFactory;
 
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class IPSTransmitter implements Transmitter {
 
     private final MonitoringObject monObj;
     private ServerConnection connection;
-    private final List<IpsPacket> buffer = new LinkedList<>();
+    private final Queue<IpsPacket> buffer = new LinkedList<>();
     private Thread communicationThread;
 
     private StateIPS state;
@@ -44,12 +46,12 @@ public class IPSTransmitter implements Transmitter {
             state.createNetworkConnection();
             state.wialonLogin();
 
-            do {
+            while (state != stoppedState) {
                 IpsPacket ipsPacket = getPacketFromBuffer();
                 if (ipsPacket != null) {
                     state.communicate(ipsPacket);
                 }
-                } while (state != stoppedState);
+            }
             state.breakNetworkConnection();
             System.out.println(monObj.getId() + ": stopping " + threadName + " to receive messages from the server:\t" + new Date());
         });
@@ -65,19 +67,17 @@ public class IPSTransmitter implements Transmitter {
     }
 
     @Override
-    public synchronized void addToTransfer(MonitoringData monData) {
-        IpsPacket ipsPacket = new LongDataPacket.Builder(monData.getDate()).coordinates(monData.getLatitude(), monData.getLongitude())
-                        .course(monData.getCourse()).speed(monData.getSpeed())
-                        .params("fuel", ParameterType.Integer, monData.getFuelVolume().toString()).create();
+    public synchronized void addToTransfer(MonitoringData monitoringData) {
+        IpsPacket ipsPacket = IpsPacketFactory.createLongDataPacket(monitoringData);
             buffer.add(ipsPacket);
             notify();
     }
 
     private synchronized IpsPacket getPacketFromBuffer() {
-        while (buffer.size() == 0) {
+        while (buffer.isEmpty()) {
             try {
                 wait(1000 * 60 * 6);
-                if (buffer.size() == 0) {
+                if (buffer.isEmpty()) {
                     state.stopCommunication();
                     return null;
                 }
@@ -86,7 +86,7 @@ public class IPSTransmitter implements Transmitter {
                 return null;
             }
         }
-        IpsPacket ipsPacket = buffer.remove(0);
+        IpsPacket ipsPacket = buffer.poll();
         notify();
         return ipsPacket;
     }

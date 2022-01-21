@@ -9,6 +9,7 @@ public class MonitoringObject {
 
     private final Transmitter transmitter = new IPSTransmitter(this);
 //    private MonitoringData monData;
+    private MonitoringData lastData;
 
     public MonitoringObject(String id, String password) {
         this.id = id;
@@ -31,9 +32,11 @@ public class MonitoringObject {
         return password;
     }
 
-    public void update(MonitoringData monData) {
-//        this.monData = monData;
-        transmitter.addToTransfer(monData);
+    public synchronized void update(MonitoringData monData) {
+        if (!monData.equals(lastData)) {
+            transmitter.addToTransfer(monData);
+            lastData = monData;
+        }
     }
 
     public StateIPS getTransmitterState() {
