@@ -1,15 +1,14 @@
 package ru.alexanna.microwialon;
 
 import ru.alexanna.microwialon.wialonips.connection.IPSTransmitter;
-import ru.alexanna.microwialon.wialonips.connection.states.StateIPS;
+import ru.alexanna.microwialon.wialonips.connection.states.DisconnectedState;
 
 public class MonitoringObject {
     private final String id;
     private final String password;
 
     private final Transmitter transmitter = new IPSTransmitter(this);
-//    private MonitoringData monData;
-    private MonitoringData lastData;
+    private MonitoringData monitoringData;
 
     public MonitoringObject(String id, String password) {
         this.id = id;
@@ -33,14 +32,17 @@ public class MonitoringObject {
     }
 
     public synchronized void update(MonitoringData monData) {
-        if (!monData.equals(lastData)) {
+        if (!monData.equals(monitoringData)) {
+            if (transmitter.state() instanceof DisconnectedState) {
+                startDataTransfer();
+            }
             transmitter.addToTransfer(monData);
-            lastData = monData;
+            monitoringData = monData;
         }
     }
 
-    public StateIPS getTransmitterState() {
-        return transmitter.state();
-    }
+//    public StateIPS getTransmitterState() {
+//        return transmitter.state();
+//    }
 
 }

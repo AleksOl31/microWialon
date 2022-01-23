@@ -10,7 +10,6 @@ import ru.alexanna.microwialon.wialonips.util.IpsPacketFactory;
 
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 public class IPSTransmitter implements Transmitter {

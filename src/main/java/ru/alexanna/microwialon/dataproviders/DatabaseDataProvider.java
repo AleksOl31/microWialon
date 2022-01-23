@@ -3,7 +3,6 @@ package ru.alexanna.microwialon.dataproviders;
 import ru.alexanna.microwialon.MonitoringData;
 import ru.alexanna.microwialon.MonitoringObject;
 import ru.alexanna.microwialon.database.DatabaseConnection;
-import ru.alexanna.microwialon.wialonips.connection.states.DisconnectedState;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +12,7 @@ import java.util.*;
 
 public class DatabaseDataProvider implements DataProvider {
     private final List<MonitoringObject> wialonObjects;
-    private boolean isDeliveryStarted = false;
+    private boolean isDelivery = false;
     private final Map<Integer, String> monitoringObjectMap;
     private int dbQueryPause = 8000;
 
@@ -31,29 +30,28 @@ public class DatabaseDataProvider implements DataProvider {
 
     @Override
     public void startDataDelivery() {
-        isDeliveryStarted = true;
+        isDelivery = true;
         wialonObjects.forEach(MonitoringObject::startDataTransfer);
         createDBQueryThread().start();
     }
 
     @Override
     public void stopDataDelivery() {
-        isDeliveryStarted = false;
+        isDelivery = false;
         wialonObjects.forEach(MonitoringObject::stopDataTransfer);
     }
 
     private Thread createDBQueryThread() {
         return new Thread(() -> {
-            while (isDeliveryStarted) {
-                Map<Integer, MonitoringData> monDataMap = /*mySQLLookup();*/  safDBLookup();
-                monDataMap.forEach((kvartaId, monData) -> {
+            while (isDelivery) {
+                Map<Integer, MonitoringData> dbMonDataMap = /*mySQLLookup();*/  safDBLookup();
+                dbMonDataMap.forEach((kvartaId, monData) -> {
+                    // TODO выделить в отдельный метод - findObjectInWialonObjects(Integer kvartaId)
                         String wialonId = monitoringObjectMap.get(kvartaId);
                         Optional<MonitoringObject> monObj = wialonObjects.stream()
                                 .filter(monitoringObject -> Objects.equals(monitoringObject.getId(), wialonId))
                                 .findFirst();
                         if (monObj.isPresent()) {
-                            if (monObj.get().getTransmitterState() instanceof DisconnectedState)
-                                monObj.get().startDataTransfer();
                             monObj.get().update(monData);
                         }
                 });
@@ -64,7 +62,7 @@ public class DatabaseDataProvider implements DataProvider {
                     e.printStackTrace();
                 }
             }
-            System.out.println("DB Thread stopped");
+            System.out.println("DBLookup Thread stopped");
         });
     }
 

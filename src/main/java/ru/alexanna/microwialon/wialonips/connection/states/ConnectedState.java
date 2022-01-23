@@ -1,11 +1,12 @@
 package ru.alexanna.microwialon.wialonips.connection.states;
 
+import ru.alexanna.microwialon.MonitoringObject;
 import ru.alexanna.microwialon.wialonips.connection.IPSCommunicator;
 import ru.alexanna.microwialon.wialonips.connection.IPSTransmitter;
 import ru.alexanna.microwialon.wialonips.ipsexceptions.IPSConnectException;
 import ru.alexanna.microwialon.wialonips.ipsexceptions.IPSLoginException;
 import ru.alexanna.microwialon.wialonips.packettypes.IpsPacket;
-import ru.alexanna.microwialon.wialonips.packettypes.LoginPacket;
+import ru.alexanna.microwialon.wialonips.util.IpsPacketFactory;
 
 public class ConnectedState implements StateIPS {
     private final IPSTransmitter ipsTransmitter;
@@ -21,7 +22,8 @@ public class ConnectedState implements StateIPS {
 
     @Override
     public synchronized void wialonLogin() {
-        communicate(new LoginPacket(ipsTransmitter.getMonObj().getId(), null));
+        MonitoringObject monObj = ipsTransmitter.getMonObj();
+        communicate(IpsPacketFactory.createLoginPacket(monObj.getId(), monObj.getPassword()));
     }
 
     @Override
