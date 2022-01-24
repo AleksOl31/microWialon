@@ -46,12 +46,8 @@ public class DatabaseDataProvider implements DataProvider {
             while (isDelivery) {
                 Map<Integer, MonitoringData> dbMonDataMap = /*mySQLLookup();*/  safDBLookup();
                 dbMonDataMap.forEach((kvartaId, monData) -> {
-                    // TODO выделить в отдельный метод - findObjectInWialonObjects(Integer kvartaId)
-                        String wialonId = monitoringObjectMap.get(kvartaId);
-                        Optional<MonitoringObject> monObj = wialonObjects.stream()
-                                .filter(monitoringObject -> Objects.equals(monitoringObject.getId(), wialonId))
-                                .findFirst();
-                        if (monObj.isPresent()) {
+                    Optional<MonitoringObject> monObj = findInWialonObjectsList(kvartaId);
+                    if (monObj.isPresent()) {
                             monObj.get().update(monData);
                         }
                 });
@@ -64,6 +60,13 @@ public class DatabaseDataProvider implements DataProvider {
             }
             System.out.println("DBLookup Thread stopped");
         });
+    }
+
+    private Optional<MonitoringObject> findInWialonObjectsList(Integer kvartaId) {
+        String wialonId = monitoringObjectMap.get(kvartaId);
+        return wialonObjects.stream()
+                .filter(monitoringObject -> Objects.equals(monitoringObject.getId(), wialonId))
+                .findFirst();
     }
 
     private Map<Integer, MonitoringData> safDBLookup() {

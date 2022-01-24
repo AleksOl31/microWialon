@@ -13,6 +13,7 @@ public class DisconnectedState implements StateIPS {
 
     @Override
     public synchronized void createNetworkConnection() {
+        // TODO обработать исключение установления связи с сервером и обрыва связи
         ipsTransmitter.setConnection(new ServerConnection());
         if (ipsTransmitter.getConnection().isConnected()) {
             ipsTransmitter.setState(ipsTransmitter.getConnectedState());

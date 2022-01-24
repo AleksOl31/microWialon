@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class ServerConnection {
 
-    private final String HOST =  /*"10.70.0.160"; */  "82.151.104.72";
+    private final String HOST =  "10.70.0.160";  // "82.151.104.72";
     private final int PORT = 20332;
 
     private final Socket socket;
