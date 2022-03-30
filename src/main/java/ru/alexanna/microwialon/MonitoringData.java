@@ -106,7 +106,7 @@ public class MonitoringData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MonitoringData that = (MonitoringData) o;
-        return /*Objects.equals(date, that.date) && */ Objects.equals(latitude, that.latitude) && Objects.equals(longitude, that.longitude) && Objects.equals(speed, that.speed) && Objects.equals(course, that.course) && Objects.equals(height, that.height) && Objects.equals(sats, that.sats) && Objects.equals(fuelVolume, that.fuelVolume) && Objects.equals(fuelWeight, that.fuelWeight) && Objects.equals(fuelTemp, that.fuelTemp);
+        return /*Objects.equals(date, that.date) && */ Objects.equals(latitude, that.latitude) && Objects.equals(longitude, that.longitude) && Objects.equals(speed, that.speed) /*&& Objects.equals(course, that.course)*/ && Objects.equals(height, that.height) && Objects.equals(sats, that.sats) && Objects.equals(fuelVolume, that.fuelVolume) && Objects.equals(fuelWeight, that.fuelWeight) && Objects.equals(fuelTemp, that.fuelTemp);
     }
 
     @Override

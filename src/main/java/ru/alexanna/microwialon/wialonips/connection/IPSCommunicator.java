@@ -18,10 +18,11 @@ public class IPSCommunicator {
 
     public void communicate(IpsPacket ipsPacket) throws RuntimeException {
         connection.sendMessage(ipsPacket);
-        String sentLogStr = ipsPacket.getMessage() + "-package sent on: \t" + new Date() + "\t";
+//        String sentLogStr = ipsPacket.getPacketType() + "-package sent on: \t" + "\t";
+//        String sentLogStr = ipsPacket.getMessage() + "-package sent on: \t" + new Date() + "\t";
         String response = connection.receiveMessage();
-        String receiveLogStr = response + " - server response received on: \t" + new Date();
-        System.out.println(sentLogStr + receiveLogStr);
+//        String receiveLogStr = response + " - server response received on: \t" + new Date();
+//        System.out.println(sentLogStr + receiveLogStr);
         if (response == null) {
             throw new IPSConnectException("Server returned null.");
         }

@@ -13,7 +13,7 @@ public class Monitoring {
 
     public Monitoring() {
 
-        dataProvider = new DatabaseDataProvider(getMonitoringObjectMap());
+        dataProvider = new DatabaseDataProvider(new MonitoringObjectsLoader().getMonitoringObjectMap());
     }
 
     public void startMonitoring() {
@@ -24,7 +24,7 @@ public class Monitoring {
         dataProvider.stopDataDelivery();
     }
 
-    private Map<Integer, String> getMonitoringObjectMap() {
+   /* private Map<Integer, String> getMonitoringObjectMap() {
         Map<Integer, String> monitoringObjectMap = new HashMap<>();
         monitoringObjectMap.put(65, "20220001");
         monitoringObjectMap.put(85, "20220002");
@@ -61,13 +61,13 @@ public class Monitoring {
 
         monitoringObjectMap.put(4444, "20220033");
         monitoringObjectMap.put(4835, "20220034");
-        monitoringObjectMap.put(5656, "20220035");
+        monitoringObjectMap.put(5009, "20220035");
         monitoringObjectMap.put(8260, "20220036");
 
         monitoringObjectMap.put(403, "20220037");
         monitoringObjectMap.put(1998, "20220038");
 
-//        monitoringObjectMap.put(65, "20221111");
+//        monitoringObjectMap.put(3245, "20221111");
         return monitoringObjectMap;
-    }
+    }*/
 }
