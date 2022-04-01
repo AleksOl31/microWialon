@@ -33,7 +33,7 @@ public class MonitoringObject {
 
     public synchronized void update(MonitoringData monData) {
         if (!monData.equals(monitoringData)) {
-            if (transmitter.state() instanceof DisconnectedState) {
+            if (transmitter.getState() instanceof DisconnectedState) {
                 startDataTransfer();
             }
             createCourseData(monData);
@@ -73,9 +73,5 @@ public class MonitoringObject {
             monData.setCourse(degrees);
         }
     }
-
-//    public StateIPS getTransmitterState() {
-//        return transmitter.state();
-//    }
 
 }

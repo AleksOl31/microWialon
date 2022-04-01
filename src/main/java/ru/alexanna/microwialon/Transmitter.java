@@ -7,7 +7,5 @@ public interface Transmitter {
     void start();
     void stop();
     void addToTransfer(MonitoringData monData);
-
-    // TODO создать интерфейс состоний
-    StateIPS state();
+    StateIPS getState();
 }

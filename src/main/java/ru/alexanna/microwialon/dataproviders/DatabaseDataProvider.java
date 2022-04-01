@@ -45,12 +45,9 @@ public class DatabaseDataProvider implements DataProvider {
         return new Thread(() -> {
             while (isDelivery) {
                 Map<Integer, MonitoringData> dbMonDataMap = /*mySQLLookup();*/  safDBLookup();
-                dbMonDataMap.forEach((kvartaId, monData) -> {
-                    Optional<MonitoringObject> monObj = findInWialonObjectsList(kvartaId);
-                    if (monObj.isPresent()) {
-                            monObj.get().update(monData);
-                        }
-                });
+                dbMonDataMap.forEach((kvartaId, monData) ->
+                        findInWialonObjectsList(kvartaId).ifPresent((monitoringObject ->
+                                monitoringObject.update(monData))));
 
                 try {
                     Thread.sleep(dbQueryPause);
@@ -136,11 +133,16 @@ public class DatabaseDataProvider implements DataProvider {
         return monDataMap;
     }
 
+    @Override
     public int getDbQueryPause() {
         return dbQueryPause;
     }
 
-    public void setDbQueryPause(int dbQueryPause) {
+    /**
+     * default dbQueryPause = 8000
+     */
+    @Override
+    public synchronized void setDbQueryPause(int dbQueryPause) {
         this.dbQueryPause = dbQueryPause;
     }
 }

@@ -61,7 +61,7 @@ public class IPSTransmitter implements Transmitter {
     }
 
     @Override
-    public StateIPS state() {
+    public StateIPS getState() {
         return state;
     }
 
