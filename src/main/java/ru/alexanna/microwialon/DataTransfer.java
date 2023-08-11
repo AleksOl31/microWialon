@@ -3,23 +3,18 @@ package ru.alexanna.microwialon;
 import ru.alexanna.microwialon.dataproviders.DataProvider;
 import ru.alexanna.microwialon.dataproviders.DatabaseDataProvider;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-public class Monitoring {
+public class DataTransfer {
     private final DataProvider dataProvider;
 
-    public Monitoring() {
+    public DataTransfer() {
         dataProvider = new DatabaseDataProvider(new MonitoringObjectsLoader().getMonitoringObjectMap());
     }
 
-    public void startMonitoring() {
+    public void startTransfer() {
         dataProvider.startDataDelivery();
     }
 
-    public void stopMonitoring() {
+    public void stopTransfer() {
         dataProvider.stopDataDelivery();
     }
 
